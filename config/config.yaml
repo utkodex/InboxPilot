@@ -1,0 +1,8 @@
+google_sheet:
+  google_sheet_link: "https://docs.google.com/spreadsheets/d/1h0t_E-r-ooxDycT0tZo6-B39uZa-9GTMDNiNSsQZ1Lk/edit?gid=0#gid=0"
+  google_sheet_subsheet_name: "Sheet1"
+  credentials_json: "credentials.json"
+
+embedding_model:
+  provider: "google"
+  model_name: "models/text-embedding-004"

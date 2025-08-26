@@ -1,0 +1,4 @@
+gspread
+pyyaml
+
+-e .
