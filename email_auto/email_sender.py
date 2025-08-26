@@ -31,7 +31,7 @@ class EmailSender:
         self.sender_email = os.getenv('SENDER_EMAIL')
         self.sender_pass = os.getenv('SENDER_PASS')
 
-    def send_email(self, recipient_email, subject, body):
+    def send_email(self, recipient_email, subject, body, cc=None, bcc=None):
         """
         Send an email using the SMTP protocol.
 
@@ -41,7 +41,29 @@ class EmailSender:
         """
         msg = MIMEMultipart()
         msg['From'] = self.sender_email
-        msg['To'] = recipient_email
+
+        # Handle single or multiple "To"
+        if isinstance(recipient_email, str):
+            recipient_email = [recipient_email]
+        msg['To'] = ", ".join(recipient_email)
+
+
+        # Handle CC
+        if cc:
+            if isinstance(cc, str):
+                cc = [cc]
+            msg['Cc'] = ", ".join(cc)
+        else:
+            cc = []
+
+        # Handle BCC (not added to headers)
+        if bcc:
+            if isinstance(bcc, str):
+                bcc = [bcc]
+        else:
+            bcc = []
+
+
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
 
@@ -49,10 +71,12 @@ class EmailSender:
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()
                 server.login(self.sender_email, self.sender_pass)
-                server.send_message(msg)
-            logger.info("Email sent to: %s", recipient_email)
+                # Must send to all: To + CC + BCC
+                all_recipients = recipient_email + cc + bcc
+                server.sendmail(self.sender_email, all_recipients, msg.as_string())
+            logger.info("Email sent to: %s (CC: %s, BCC: %s)", recipient_email, cc, bcc)
         except Exception as e:
-            logger.error("Email not sent to: %s | Error: %s", recipient_email, str(e))
+            logger.error("Email not sent | Error: %s", str(e))
             raise
 
 
@@ -64,6 +88,8 @@ if __name__ == "__main__":
     a=EmailSender()
     recipient_email= "bizzboosterdata@gmail.com" 
     subject= "Subject check" 
-    body= "This is a test email from the EmailSender2 class."
+    body= "This is a test email from the EmailSender2 class. added bcc"
+    cc = ["sinhautkarshgc@gmail.com"]
+    bcc = "bballb040121503516@gmail.com"
     
-    a.send_email(recipient_email, subject, body)
+    a.send_email(recipient_email, subject, body, cc, bcc)

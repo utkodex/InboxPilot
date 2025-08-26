@@ -81,27 +81,6 @@ class GoogleSheetClient:
         except Exception as e:
             logging.info(e)
             raise MyException(e, sys) from e
-        
-    # def dataset_to_json(self):
-    #     try:
-    #         records = self.get_records()
-    #         logging.info("Converting records to JSON format.")
-    #         data = []
-
-    #         for row in records:
-    #             recipient_email=row[0]
-    #             recipient_name=row[1]
-    #             subject=row[2]
-    #             body=row[3]
-
-    #             print(f"To: {recipient_email}, Name: {recipient_name}, Subject: {subject}, Body: {body}")
-    #             data.append({"name": recipient_email, "link": recipient_name, "name2": subject, "link2": body})
-    #         logging.info("Records converted to JSON format successfully.")
-    #         return data
-        
-    #     except Exception as e:
-    #         logging.info(e)
-    #         raise MyException(e, sys) from e
 
     def dataset_to_json(self) -> List[Dict[str, Any]]:
         """
