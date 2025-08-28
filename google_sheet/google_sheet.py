@@ -102,13 +102,19 @@ class GoogleSheetClient:
             for row in records:
                 recipient_email=row[0]
                 recipient_name=row[1]
-                subject=row[2]
-                body=row[3]
+                cc=row[2]
+                bcc=row[3]
+                subject=row[4]
+                body=row[5]
 
-                data.append({"Recipient Email": recipient_email, 
-                             "Recipient Name": recipient_name, 
-                             "Subject": subject, 
-                             "Body": body})
+                data.append({   
+                    "Recipient Email": recipient_email, 
+                    "Recipient Name": recipient_name, 
+                    "CC": cc,
+                    "BCC": bcc,
+                    "Subject": subject, 
+                    "Body": body
+                    })
 
             logging.info("Successfully converted %d records to JSON.", len(data))
             return data
