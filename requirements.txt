@@ -1,4 +1,6 @@
 gspread
 pyyaml
+streamlit
+dotenv
 
 -e .

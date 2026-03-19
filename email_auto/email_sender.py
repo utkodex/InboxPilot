@@ -1,6 +1,7 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication  # ✅ for attachments
 import logging
 import logger
 from dotenv import load_dotenv
@@ -31,7 +32,7 @@ class EmailSender:
         self.sender_email = os.getenv('SENDER_EMAIL')
         self.sender_pass = os.getenv('SENDER_PASS')
 
-    def send_email(self, recipient_email, subject, body, cc=None, bcc=None):
+    def send_email(self, recipient_email, subject, body, cc=None, bcc=None, attachments=None):
         """
         Send an email using the SMTP protocol.
 
@@ -42,30 +43,45 @@ class EmailSender:
         msg = MIMEMultipart()
         msg['From'] = self.sender_email
 
-        # Handle single or multiple "To"
+        # Handle single or multiple "To" (including comma-separated string from sheet)
         if isinstance(recipient_email, str):
-            recipient_email = [recipient_email]
+            recipient_email = [addr.strip() for addr in recipient_email.split(",") if addr.strip()]
         msg['To'] = ", ".join(recipient_email)
 
 
-        # Handle CC
+        # Handle CC (including comma-separated string from sheet)
         if cc:
             if isinstance(cc, str):
-                cc = [cc]
+                cc = [addr.strip() for addr in cc.split(",") if addr.strip()]
             msg['Cc'] = ", ".join(cc)
         else:
             cc = []
 
-        # Handle BCC (not added to headers)
+        # Handle BCC (not added to headers, including comma-separated string from sheet)
         if bcc:
             if isinstance(bcc, str):
-                bcc = [bcc]
+                bcc = [addr.strip() for addr in bcc.split(",") if addr.strip()]
         else:
             bcc = []
 
 
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
+
+        # ✅ Handle attachments
+        if attachments:
+            if isinstance(attachments, str):
+                attachments = [attachments]
+            for file_path in attachments:
+                try:
+                    with open(file_path, "rb") as f:
+                        part = MIMEApplication(f.read(), Name=os.path.basename(file_path))
+                    part['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+                    msg.attach(part)
+                    logger.info("Attached file: %s", file_path)
+                except Exception as e:
+                    logger.error("Failed to attach file %s | Error: %s", file_path, str(e))
+                    raise
 
         try:
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
@@ -89,7 +105,8 @@ if __name__ == "__main__":
     recipient_email= "bizzboosterdata@gmail.com" 
     subject= "Subject check" 
     body= "This is a test email from the EmailSender2 class. added bcc"
-    cc = ["sinhautkarshgc@gmail.com"]
+    cc = ["bballb040121503516@gmail.com"]
     bcc = "bballb040121503516@gmail.com"
+    attachments = ["./Utkarsh Sinha CV.pdf"]  # ✅ Path to your PDF file
     
-    a.send_email(recipient_email, subject, body, cc, bcc)
+    a.send_email(recipient_email, subject, body, cc, bcc, attachments)

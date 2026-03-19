@@ -1,6 +1,7 @@
 import gspread
 import json
 from typing import List, Dict, Any
+from datetime import datetime
 
 from logger import logging
 from exception import MyException
@@ -49,6 +50,7 @@ class GoogleSheetClient:
         self.google_sheet_link = config["google_sheet"]["google_sheet_link"]
         self.credentials_json = config["google_sheet"]["credentials_json"]
         self.google_sheet_subsheet_name = config["google_sheet"]["google_sheet_subsheet_name"]
+        self.block_list_subsheet_name = config["google_sheet"].get("block_list_subsheet_name", "block_list")
         
         logging.info("Google Sheet Client initialized with provided configuration.")
 
@@ -122,6 +124,43 @@ class GoogleSheetClient:
         except Exception as e:
                 logging.error("Failed to convert records to JSON: %s", str(e), exc_info=True)
                 raise MyException(e, sys) from e
+
+    def add_to_block_list(self, emails: List[str]) -> None:
+        """
+        Append bounced / invalid email addresses to the block_list subsheet.
+        Creates the worksheet with a header row if it does not already exist.
+
+        :param emails: List of email address strings to block-list.
+        """
+        if not emails:
+            logging.info("add_to_block_list: no emails to add, skipping.")
+            return
+
+        try:
+            gc = gspread.service_account(filename=self.credentials_json)
+            sh = gc.open_by_url(self.google_sheet_link)
+
+            # Get or create the block_list worksheet
+            try:
+                worksheet = sh.worksheet(self.block_list_subsheet_name)
+                logging.info("add_to_block_list: opened existing worksheet '%s'.", self.block_list_subsheet_name)
+            except gspread.exceptions.WorksheetNotFound:
+                worksheet = sh.add_worksheet(
+                    title=self.block_list_subsheet_name, rows="1000", cols="2"
+                )
+                worksheet.append_row(["Email", "Blocked At"], value_input_option="RAW")
+                logging.info("add_to_block_list: created new worksheet '%s'.", self.block_list_subsheet_name)
+
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            rows = [[email, timestamp] for email in emails]
+            worksheet.append_rows(rows, value_input_option="RAW")
+
+            logging.info("add_to_block_list: added %d email(s) to '%s': %s",
+                         len(emails), self.block_list_subsheet_name, emails)
+
+        except Exception as e:
+            logging.error("add_to_block_list: failed to write block list | %s", str(e), exc_info=True)
+            raise MyException(e, sys) from e
 
 if __name__ == "__main__":
     a=GoogleSheetClient().dataset_to_json()

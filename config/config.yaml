@@ -1,7 +1,11 @@
 google_sheet:
-  google_sheet_link: "https://docs.google.com/spreadsheets/d/1h0t_E-r-ooxDycT0tZo6-B39uZa-9GTMDNiNSsQZ1Lk/edit?gid=0#gid=0"
-  google_sheet_subsheet_name: "Sheet1"
+  google_sheet_link: "https://docs.google.com/spreadsheets/d/1BippKVFUFpa1KJRgK5qU2DDhl91SSKGcJsuMKxWf9PY/edit?gid=140354075#gid=140354075"
+  google_sheet_subsheet_name: "Email Step 4"
   credentials_json: "credentials.json"
+  block_list_subsheet_name: "block_list"
+
+bounce_check:
+  wait_seconds: 30
 
 embedding_model:
   provider: "google"
