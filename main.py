@@ -41,7 +41,7 @@ def email_data():
         bcc = person["BCC"]
         logging.info(f"BCC: {bcc}")
         # attachments = None
-        attachments = ["./Utkarsh Sinha CV.pdf"]
+        attachments = ["./utkarsh_sinha_3yoe_2026.pdf"]
         logging.info(f"CV: {attachments}")
 
         print("*********************📧")
@@ -75,4 +75,4 @@ def email_data():
 
 if __name__ == "__main__":
     # send_email()
-    email_data()
+    email_data()
