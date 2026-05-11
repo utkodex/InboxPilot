@@ -107,6 +107,7 @@ if __name__ == "__main__":
     body= "This is a test email from the EmailSender2 class. added bcc"
     cc = ["bballb040121503516@gmail.com"]
     bcc = "bballb040121503516@gmail.com"
-    attachments = ["./Utkarsh Sinha CV.pdf"]  # ✅ Path to your PDF file
+    cv_dir = "cv"
+    attachments = [os.path.join(cv_dir, f) for f in os.listdir(cv_dir) if os.path.isfile(os.path.join(cv_dir, f))] if os.path.exists(cv_dir) else []
     
     a.send_email(recipient_email, subject, body, cc, bcc, attachments)

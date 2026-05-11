@@ -7,6 +7,7 @@ from logger import logging
 from exception import MyException
 import sys
 import time
+import os
 from datetime import datetime
 
 def send_email(recipient_email, subject, body, cc=None, bcc=None, attachments=None):
@@ -40,8 +41,9 @@ def email_data():
         logging.info(f"CC: {cc}")
         bcc = person["BCC"]
         logging.info(f"BCC: {bcc}")
-        # attachments = None
-        attachments = ["./utkarsh_sinha_3yoe_2026.pdf"]
+        # Load attachments from the 'cv' folder
+        cv_dir = "cv"
+        attachments = [os.path.join(cv_dir, f) for f in os.listdir(cv_dir) if os.path.isfile(os.path.join(cv_dir, f))] if os.path.exists(cv_dir) else []
         logging.info(f"CV: {attachments}")
 
         print("*********************📧")
